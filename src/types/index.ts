@@ -1,11 +1,10 @@
 export interface ValveMappingEntry {
-  driver: number;
-  channel: number;
+  servoIndex: number;
 }
 
 export interface AppConfig {
   serial: {
     baudRate: number;
   };
-  valveToMotorMapping: Record<string, ValveMappingEntry>;
+  valveMappings: Record<string, ValveMappingEntry>;
 }

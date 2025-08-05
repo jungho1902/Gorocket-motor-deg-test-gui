@@ -154,9 +154,9 @@ export default function Home() {
         //     console.log(`Received motor state: ${receivedState}`); // 추가된 로그
 
         //     // Find the valve that maps to this driver and channel
-        //     const valveIdToUpdate = Object.keys(valveToMotorMapping).find(valveId => {
-        //         const mapping = valveToMotorMapping[parseInt(valveId)];
-        //         return mapping.driver === driver && mapping.channel === channel;
+        //     const valveIdToUpdate = Object.keys(valveMappings).find(valveId => {
+        //         const mapping = valveMappings[parseInt(valveId)];
+        //         return mapping.servoIndex === servoIndex;
         //     });
 
         //     if (valveIdToUpdate) {
@@ -261,13 +261,13 @@ export default function Home() {
     const valve = valves.find(v => v.id === valveId);
     if (!valve) return;
 
-    const motor = appConfig?.valveToMotorMapping?.[valve.name];
-    if (!motor) {
-        toast({ title: "Command Error", description: `No motor mapping for valve ${valve.name}.`, variant: "destructive" });
+    const mapping = appConfig?.valveMappings?.[valve.name];
+    if (!mapping) {
+        toast({ title: "Command Error", description: `No servo mapping for valve ${valve.name}.`, variant: "destructive" });
         return;
     }
 
-    const command = `${motor.driver},${motor.channel},${targetState === 'OPEN' ? 'O' : 'C'}`;
+    const command = `V,${mapping.servoIndex},${targetState === 'OPEN' ? 'O' : 'C'}`;
     sendCommand(command);
 
     // Optimistically update UI to show transition
