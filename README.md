@@ -1,3 +1,5 @@
+<img width="2879" height="1700" alt="image" src="https://github.com/user-attachments/assets/ff2199ca-45b7-43f5-a146-2680b53c5f0f" />
+
 # GOROCKET Control Suite
 
 고로켓 팀의 액체 로켓 엔진을 제어하고 감시하기 위한 **Electron + Next.js** 기반 데스크톱 GUI입니다. 시리얼 포트를 통해 구동 장치와 통신하며, 센서 데이터 표시부터 밸브 제어·자동 시퀀스까지 발사 준비에 필요한 기능을 제공합니다.
