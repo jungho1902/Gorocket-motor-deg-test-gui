@@ -38,9 +38,9 @@ app.whenReady().then(() => {
   try {
     appConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
   } catch (err) {
-    console.error('Failed to load config:', err);
-    // 더 안정적인 기본값으로 설정
-    appConfig = { serial: { baudRate: 9600 }, valveToMotorMapping: {} };
+      console.error('Failed to load config:', err);
+      // 더 안정적인 기본값으로 설정
+      appConfig = { serial: { baudRate: 9600 }, valveMappings: {} };
   }
   createWindow();
 });
@@ -173,18 +173,18 @@ ipcMain.handle('disconnect-serial', async () => {
   return false;
 });
 
-ipcMain.on('send-to-serial', (event, data) => {
-  // Validate command format before sending to serial port
-  const isValid = /^(\d+),(\d+),(O|C)$/.test(data);
-  if (!isValid) {
-    console.error('Invalid command format received:', data);
-    return;
-  }
-  if (port && port.isOpen) {
-    port.write(data + '\n', (err) => {
-      if (err) {
-        console.error('Error writing to serial port:', err);
-      }
-    });
-  }
-});
+  ipcMain.on('send-to-serial', (event, data) => {
+    // Validate command format before sending to serial port
+    const isValid = /^V,(\d+),(O|C)$/.test(data);
+    if (!isValid) {
+      console.error('Invalid command format received:', data);
+      return;
+    }
+    if (port && port.isOpen) {
+      port.write(data + '\n', (err) => {
+        if (err) {
+          console.error('Error writing to serial port:', err);
+        }
+      });
+    }
+  });
