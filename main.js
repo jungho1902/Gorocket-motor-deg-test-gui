@@ -170,6 +170,12 @@ ipcMain.handle('disconnect-serial', async () => {
 });
 
 ipcMain.on('send-to-serial', (event, data) => {
+  // Validate command format before sending to serial port
+  const isValid = /^(\d+),(\d+),(O|C)$/.test(data);
+  if (!isValid) {
+    console.error('Invalid command format received:', data);
+    return;
+  }
   if (port && port.isOpen) {
     port.write(data + '\n', (err) => {
       if (err) {
