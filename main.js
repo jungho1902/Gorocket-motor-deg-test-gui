@@ -23,7 +23,7 @@ function createWindow() {
   const startUrl = isDev
     ? 'http://localhost:9002'
     : `file://${path.join(__dirname, '../out/index.html')}`;
-  
+
   mainWindow.loadURL(startUrl);
 
   if (isDev) {
@@ -39,7 +39,8 @@ app.whenReady().then(() => {
     appConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
   } catch (err) {
     console.error('Failed to load config:', err);
-    appConfig = {};
+    // 더 안정적인 기본값으로 설정
+    appConfig = { serial: { baudRate: 9600 }, valveToMotorMapping: {} };
   }
   createWindow();
 });
@@ -82,7 +83,8 @@ ipcMain.handle('get-config', () => appConfig);
 ipcMain.on('start-logging', () => {
   const timestamp = new Date();
   const fileName = `rocket-log-${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}-${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}.csv`;
-  const filePath = path.join(__dirname, fileName);
+  // 올바른 경로로 수정된 최종 버전입니다.
+  const filePath = path.join(app.getPath('documents'), fileName);
   logStream = fs.createWriteStream(filePath, { flags: 'w' });
   logStream.write('timestamp,pt1,pt2,pt3,pt4,flow1,flow2,tc1\n');
 });
@@ -95,13 +97,10 @@ ipcMain.on('stop-logging', () => {
 });
 
 // --- 시리얼 통신 관련 코드 ---
-
-// 사용 가능한 시리얼 포트 목록을 UI에 전송
 ipcMain.handle('get-serial-ports', async () => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 200)); // Add a small delay
+    await new Promise(resolve => setTimeout(resolve, 200));
     const ports = await SerialPort.list();
-    console.log('Available serial ports:', ports); // 추가된 로그
     return ports.map(p => p.path);
   } catch (error) {
     console.error('Failed to list serial ports:', error);
@@ -109,7 +108,6 @@ ipcMain.handle('get-serial-ports', async () => {
   }
 });
 
-// 시리얼 포트 연결
 ipcMain.handle('connect-serial', async (event, portName) => {
   if (port && port.isOpen) {
     await new Promise(resolve => port.close(resolve));
@@ -127,7 +125,6 @@ ipcMain.handle('connect-serial', async (event, portName) => {
 
     port.on('open', () => {
       console.log(`Serial port ${portName} opened`);
-      
       port.on('data', (data) => {
         const str = data.toString();
         mainWindow.webContents.send('serial-data', str);
@@ -146,18 +143,15 @@ ipcMain.handle('connect-serial', async (event, portName) => {
           logStream.write(line);
         }
       });
-
       port.on('error', (err) => {
         console.error('Serial Port Error: ', err);
         mainWindow.webContents.send('serial-error', err.message);
       });
-
       resolve(true);
     });
   });
 });
 
-// 시리얼 포트 연결 해제
 ipcMain.handle('disconnect-serial', async () => {
   if (port && port.isOpen) {
     return new Promise(resolve => {
@@ -175,7 +169,6 @@ ipcMain.handle('disconnect-serial', async () => {
   return false;
 });
 
-// 아두이노로 데이터 전송
 ipcMain.on('send-to-serial', (event, data) => {
   if (port && port.isOpen) {
     port.write(data + '\n', (err) => {
