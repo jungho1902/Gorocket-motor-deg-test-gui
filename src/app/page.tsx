@@ -209,10 +209,12 @@ export default function Home() {
         setConnectionStatus('disconnected');
     };
 
-    window.electronAPI.onSerialData(handleSerialData);
-    window.electronAPI.onSerialError(handleSerialError);
+    const cleanupSerialData = window.electronAPI.onSerialData(handleSerialData);
+    const cleanupSerialError = window.electronAPI.onSerialError(handleSerialError);
 
     return () => {
+      cleanupSerialData();
+      cleanupSerialError();
       sequenceTimeoutRef.current.forEach(clearTimeout);
     };
   }, [sensorData]);
