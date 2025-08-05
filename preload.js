@@ -7,7 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   sendToSerial: (data) => ipcRenderer.send('send-to-serial', data),
   onSerialData: (callback) => ipcRenderer.on('serial-data', (_event, value) => callback(value)),
   onSerialError: (callback) => ipcRenderer.on('serial-error', (_event, value) => callback(value)),
-  removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
   zoomIn: () => ipcRenderer.send('zoom-in'),
   zoomOut: () => ipcRenderer.send('zoom-out'),
   zoomReset: () => ipcRenderer.send('zoom-reset'),

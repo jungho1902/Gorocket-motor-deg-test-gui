@@ -213,8 +213,6 @@ export default function Home() {
     window.electronAPI.onSerialError(handleSerialError);
 
     return () => {
-      window.electronAPI.removeAllListeners('serial-data');
-      window.electronAPI.removeAllListeners('serial-error');
       sequenceTimeoutRef.current.forEach(clearTimeout);
     };
   }, [sensorData]);
