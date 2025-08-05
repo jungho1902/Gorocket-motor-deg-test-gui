@@ -1,10 +1,13 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const isDev = require('electron-is-dev');
 const { SerialPort } = require('serialport');
 
 let mainWindow;
 let port;
+let logStream;
+let appConfig;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -30,7 +33,16 @@ function createWindow() {
   mainWindow.on('closed', () => (mainWindow = null));
 }
 
-app.on('ready', createWindow);
+app.whenReady().then(() => {
+  const configPath = path.join(__dirname, 'config.json');
+  try {
+    appConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  } catch (err) {
+    console.error('Failed to load config:', err);
+    appConfig = {};
+  }
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -65,6 +77,23 @@ ipcMain.on('zoom-reset', () => {
   }
 });
 
+ipcMain.handle('get-config', () => appConfig);
+
+ipcMain.on('start-logging', () => {
+  const timestamp = new Date();
+  const fileName = `rocket-log-${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}-${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}.csv`;
+  const filePath = path.join(__dirname, fileName);
+  logStream = fs.createWriteStream(filePath, { flags: 'w' });
+  logStream.write('timestamp,pt1,pt2,pt3,pt4,flow1,flow2,tc1\n');
+});
+
+ipcMain.on('stop-logging', () => {
+  if (logStream) {
+    logStream.end();
+    logStream = null;
+  }
+});
+
 // --- 시리얼 통신 관련 코드 ---
 
 // 사용 가능한 시리얼 포트 목록을 UI에 전송
@@ -85,9 +114,11 @@ ipcMain.handle('connect-serial', async (event, portName) => {
   if (port && port.isOpen) {
     await new Promise(resolve => port.close(resolve));
   }
-  
+
+  const baudRate = appConfig?.serial?.baudRate || 9600;
+
   return new Promise((resolve) => {
-    port = new SerialPort({ path: portName, baudRate: 9600 }, (err) => {
+    port = new SerialPort({ path: portName, baudRate }, (err) => {
       if (err) {
         console.error('Failed to open port:', err);
         resolve(false);
@@ -98,7 +129,22 @@ ipcMain.handle('connect-serial', async (event, portName) => {
       console.log(`Serial port ${portName} opened`);
       
       port.on('data', (data) => {
-        mainWindow.webContents.send('serial-data', data.toString());
+        const str = data.toString();
+        mainWindow.webContents.send('serial-data', str);
+
+        if (logStream) {
+          const parts = str.split(',');
+          const parsed = {};
+          parts.forEach(part => {
+            const [key, value] = part.split(':');
+            if (key && value) {
+              parsed[key.trim()] = value.trim();
+            }
+          });
+          const fields = ['pt1','pt2','pt3','pt4','flow1','flow2','tc1'];
+          const line = `${Date.now()},${fields.map(f => parsed[f] || '').join(',')}\n`;
+          logStream.write(line);
+        }
       });
 
       port.on('error', (err) => {
