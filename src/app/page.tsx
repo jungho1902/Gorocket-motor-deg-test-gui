@@ -217,6 +217,12 @@ export default function Home() {
     };
   }, [sensorData]);
 
+  useEffect(() => {
+    window.electronAPI.onLogCreationFailed(() => {
+      toast({ title: "Logging Error", description: "Failed to create log file.", variant: "destructive" });
+    });
+  }, [toast]);
+
   const handleConnect = async () => {
     if (connectionStatus === 'connected') {
       await window.electronAPI.disconnectSerial();

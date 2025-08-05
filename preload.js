@@ -13,4 +13,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startLogging: () => ipcRenderer.send('start-logging'),
   stopLogging: () => ipcRenderer.send('stop-logging'),
   getConfig: () => ipcRenderer.invoke('get-config'),
+  onLogCreationFailed: (callback) => ipcRenderer.on('log-creation-failed', (_event, value) => callback(value)),
 });
