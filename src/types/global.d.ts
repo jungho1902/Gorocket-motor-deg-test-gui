@@ -10,7 +10,6 @@ declare global {
       sendToSerial: (data: string) => void;
       onSerialData: (callback: (data: string) => void) => void;
       onSerialError: (callback: (error: string) => void) => void;
-      removeAllListeners: (channel: string) => void;
       zoomIn: () => void;
       zoomOut: () => void;
       zoomReset: () => void;
