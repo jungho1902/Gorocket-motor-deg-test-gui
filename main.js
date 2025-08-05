@@ -86,6 +86,10 @@ ipcMain.on('start-logging', () => {
   // 올바른 경로로 수정된 최종 버전입니다.
   const filePath = path.join(app.getPath('documents'), fileName);
   logStream = fs.createWriteStream(filePath, { flags: 'w' });
+  logStream.on('error', (err) => {
+    console.error('Failed to create log file:', err);
+    mainWindow?.webContents.send('log-creation-failed', err.message);
+  });
   logStream.write('timestamp,pt1,pt2,pt3,pt4,flow1,flow2,tc1\n');
 });
 
