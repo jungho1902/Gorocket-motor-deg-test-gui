@@ -10,5 +10,10 @@
     "Pressurant Fill": { "servoIndex": 4 },
     "System Vent": { "servoIndex": 5 },
     "Igniter Fuel": { "servoIndex": 6 }
+  },
+  "motorMappings": {
+    "Gimbal Pitch": { "servoIndex": 4 },
+    "Gimbal Yaw": { "servoIndex": 5 },
+    "Throttle Control": { "servoIndex": 6 }
   }
 }
