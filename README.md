@@ -1,3 +1,5 @@
+<img width="2879" height="1703" alt="스크린샷 2025-08-06 164755" src="https://github.com/user-attachments/assets/47f65f25-444e-4c63-8401-bc1301e16013" />
+
 # GOROCKET Servo Angle Test GUI
 
 고로켓 팀의 7개 서보 밸브 각도를 시험하기 위한 **Electron + Next.js** 기반 데스크톱 앱입니다. PC와 Arduino 기반 서보 컨트롤러를 시리얼 포트로 연결해 각 밸브의 구동 범위를 확인할 수 있습니다.
@@ -60,7 +62,3 @@ Arduino 스케치는 [`mortor_control_test.ino`](./mortor_control_test.ino)에 �
 │   └── components/...     # 대시보드 패널들
 └── config.json            # 시리얼 및 모터 매핑 설정
 ```
-
-## 라이선스
-
-[MIT License](./LICENSE)
