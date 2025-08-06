@@ -1,4 +1,4 @@
-<img width="2879" height="1700" alt="image" src="https://github.com/user-attachments/assets/ff2199ca-45b7-43f5-a146-2680b53c5f0f" />
+<img width="2879" height="1703" alt="image" src="https://github.com/user-attachments/assets/4e425842-714d-4cf8-adf9-d3e9e22a8d9c" />
 
 # GOROCKET Control Suite
 
