@@ -117,7 +117,7 @@ ipcMain.handle('connect-serial', async (event, portName) => {
     await new Promise(resolve => port.close(resolve));
   }
 
-  const baudRate = appConfig?.serial?.baudRate || 9600;
+  const baudRate = 115200;
 
   return new Promise((resolve) => {
     port = new SerialPort({ path: portName, baudRate }, (err) => {
@@ -175,7 +175,7 @@ ipcMain.handle('disconnect-serial', async () => {
 
   ipcMain.on('send-to-serial', (event, data) => {
     // Validate command format before sending to serial port
-    const isValid = /^V,(\d+),(O|C)$/.test(data);
+    const isValid = /^M,(\d+),(\d+)$/.test(data);
     if (!isValid) {
       console.error('Invalid command format received:', data);
       return;
